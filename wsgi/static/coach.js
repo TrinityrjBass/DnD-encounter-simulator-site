@@ -111,60 +111,77 @@ function Add(newbie) {
 	}
 
 function AddA() {
-	var newbie=$("#drop").val();
-	Add(newbie);
-	$("#confA").show("slow");
-	$("#confA").hide("slow");
-	}
+    var newbie = $("#drop").val();
+    var numberOf = $("#numberOfA").val();
 
-function AddB() {
-	try{
-	newbie=JSON.parse($("#def").val());
-	if( typeof newbie === 'string' ) {
-		newbie=[newbie];
-		console.log('Converted string to array');
-		console.log(newbie);
-		}
-	}
-	catch(err){
-		console.log("ISSUE WITH INPUT");
-		console.log($("#def").val());
-		$("#failB").show("slow");
-		$("#failB").hide("slow");
-		return 0
-	}
+    for (var x = 0; x < numberOf; x++) {
+        Add(newbie);
+    }
+
+    $("#confA").show("slow");
+    $("#confA").hide("slow");
+}
+
+//function AddB() {
+//	try{
+//	newbie=JSON.parse($("#def").val());
+//	if( typeof newbie === 'string' ) {
+//		newbie=[newbie];
+//		console.log('Converted string to array');
+//		console.log(newbie);
+//		}
+//	}
+//	catch(err){
+//		console.log("ISSUE WITH INPUT");
+//		console.log($("#def").val());
+//		$("#failB").show("slow");
+//		$("#failB").hide("slow");
+//		return 0
+//	}
 	
-	var lineup=JSON.parse(sessionStorage.getItem('lineup'))
+//	var lineup=JSON.parse(sessionStorage.getItem('lineup'))
 	
-	try {
-	var lineplus=JSON.stringify(lineup.concat(newbie));
-	sessionStorage.setItem('lineup', lineplus);
-	} catch (err) {
-		console.log("ISSUE ADDING INPUT TO JSON");
-		console.log($("#def").val());
-		$("#failB").show("slow");
-		$("#failB").hide("slow");
-		return 0
-		}
+//	try {
+//	var lineplus=JSON.stringify(lineup.concat(newbie));
+//	sessionStorage.setItem('lineup', lineplus);
+//	} catch (err) {
+//		console.log("ISSUE ADDING INPUT TO JSON");
+//		console.log($("#def").val());
+//		$("#failB").show("slow");
+//		$("#failB").hide("slow");
+//		return 0
+//		}
 	
-	$("#lineup").html(lineplus);
-	$("#confB").show("slow");
-	$("#def").val("");
-	$("#confB").hide("slow");
-	}
+//	$("#lineup").html(lineplus);
+//	$("#confB").show("slow");
+//	$("#def").val("");
+//	$("#confB").hide("slow");
+//	}
 	
 function AddC() {
-		var newbie={};
-	$("#table").find('input').each(function(index, element) {
-        key=$(this).attr('id');
-		var v=$("#"+key).val();
-		if (!!v) {newbie[key]=$("#"+key).val();}
-			$("#"+key).val("");
+    var newbie = {};
+    var numberOf = $("#numberOfC").val();
+
+    $("#table").find('input').each(function (index, element) {
+        key = $(this).attr('id');
+        var v = $("#" + key).val();
+        if (!!v) { newbie[key] = $("#" + key).val(); }
+        //$("#"+key).val("");
     });
-	Add(newbie);
-	$("#confC").show("slow");
-	$("#confC").hide("slow");
-	}
+
+    for (var x = 0; x < numberOf; x++) {
+        Add(newbie);
+    }
+    $("#confC").show("slow");
+    $("#confC").hide("slow");
+}
+
+function clearC() {
+    $("#table").find('input').each(function (index, element) {
+        key = $(this).attr('id');
+        $("#" + key).val("");
+    });
+}
 	
 function initial() {
 	$("#def").keyup(function(event){if(event.keyCode == 13){AddB();}});

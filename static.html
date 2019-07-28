@@ -79,9 +79,8 @@ button {width:100px; text-align:justify}
             of the code</a>. For example, due to the complexity of the tactical decisions involved, which human players
             often fail at, the encounters are performed with the assumption that everyone borders everyone. The script
             is 5e focused in the way it handles crits, conditions, advatages and disadvantages.</p>
-            <p style="text-align:justify; text-align-last:center;">Here are provided three ways to input the list of
-                combattants. The first is picking creatures from the beastiary table, the second relies on a set of
-                hardcoded creatures, many which have not yet been moved to the beastiary table and the third allows
+            <p style="text-align:justify; text-align-last:center;">Here are provided two ways to input the list of
+                combattants. The first is picking creatures from the beastiary table, the second allows
                 custom creatures to be added. The latter is a tad limited: for example nets, <i>barkskin</i> and rage
                 cannot be added despite the fact that the presets "netsharpshooter", "druid" and "barbarian" use them.<br/>
                 NB. The program times out after a minute, therefore if the battles are lengthy (<i>e.g.</i> one good
@@ -245,10 +244,36 @@ button {width:100px; text-align:justify}
                      </td>
                  </tr>
                 <tr>
-                    <td class=clear>Morale:</td>
+                    <td class=clear>CR:</td>
                     <td class="clear">
-                        <input type="number" id="morale" value="10" min="1" style="width:60%" />
-                        </textarea><i class="fa fa-question" data-tooltip="Current Morale, or Max Morale?"></i>
+                        <input list="BR" name="browser" min=".125" style="width:60%" required>
+                        <datalist id="BR">
+                            <option value=".125">
+                            <option value=".25">
+                            <option value=".5">
+                            <option value="1">
+                            <option value="2">
+                            <option value="3">
+                            <option value="4">
+                            <option value="5">
+                            <option value="6">
+                            <option value="7">
+                            <option value="8">
+                            <option value="9">
+                            <option value="10">
+                            <option value="11">
+                            <option value="12">
+                            <option value="13">
+                            <option value="14">
+                            <option value="15">
+                            <option value="16">
+                            <option value="17">
+                            <option value="18">
+                            <option value="19">
+                            <option value="20">
+                        </datalist>
+                        <!--<input type="number" id="cr" value="10" min=".1" style="width:60%" required />-->
+                        </textarea><i class="fa fa-question" data-tooltip="CR is used here to de"></i>
                     </td>
                 </tr>
             </table>

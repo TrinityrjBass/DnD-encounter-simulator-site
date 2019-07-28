@@ -1,9 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\static",
-    "\\wsgi"
+    ""
   ],
-  "SelectedNode": "\\wsgi.py",
+  "SelectedNode": "\\static.html",
   "PreviewInSolutionExplorer": false
 }

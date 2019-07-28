@@ -28,6 +28,7 @@ def application(environ, start_response):
         return getter(environ, start_response)
 
 def sendindex():
+    #Add creatures from bestiary to dropdown selection 
     ctype = 'text/html'
     h=open(apppath+"static.html")
     response_body = h.read()
@@ -63,7 +64,7 @@ def getter(environ, start_response):
         response_body = open('wsgi/static/favicon.ico','rb').read()
     elif environ['PATH_INFO'].find('/static') != -1: #why is localhost wsgi/static not working?!! It i quicker to botch it for now.
         #ctype = environ['HTTP_ACCEPT'].split(',')[0]
-        #print("path.... ", environ['PATH_INFO'])
+        print("path.... ", environ['PATH_INFO'])
         protoctype=environ['PATH_INFO'].split('.')[-1]
         if protoctype =='css':
             ctype='text/css'

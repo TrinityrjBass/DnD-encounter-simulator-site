@@ -181,7 +181,7 @@ button {width:100px; text-align:justify}
                  <tr>
                      <td class=clear>Number of healing spells:</td>
                      <td class=clear>
-                         <input type="number" id=healing_spells value="1" min="1" style="width:60%">
+                         <input type="number" id=healing_spells value="0" min="0" style="width:60%">
                          </textarea><i class="fa fa-question"
                                        data-tooltip="Number of healing word spells (cantrip, only)"></i>
                      </td>
@@ -189,7 +189,7 @@ button {width:100px; text-align:justify}
                  <tr>
                      <td class=clear>healing dice:</td>
                      <td class=clear>
-                         <input type="number" id=healing_dice value="1" min="1" style="width:60%"> <!--drop down options?-->
+                         <input type="number" id=healing_dice value="0" min="0" style="width:60%"> <!--drop down options?-->
                          </textarea><i class="fa fa-question"
                                        data-tooltip="number without the d. d4 is the default."></i>
                      </td>
@@ -197,7 +197,7 @@ button {width:100px; text-align:justify}
                  <tr>
                      <td class=clear>healing bonus:</td>
                      <td class=clear>
-                         <input type="number" id=healing_bonus value="1" min="1" style="width:60%">
+                         <input type="number" id=healing_bonus value="0" min="1" style="width:60%">
                          </textarea><i class="fa fa-question" data-tooltip="the bonus to your heal"></i>
                      </td>
                  </tr>
@@ -246,21 +246,21 @@ button {width:100px; text-align:justify}
                 <tr>
                     <td class=clear>CR:</td>
                     <td class="clear">
-                        <input list="BR" name="browser" min=".125" style="width:60%" required>
-                        <datalist id="BR">
-                            <option value=".125">
-                            <option value=".25">
-                            <option value=".5">
-                            <option value="1">
-                            <option value="2">
-                            <option value="3">
-                            <option value="4">
-                            <option value="5">
-                            <option value="6">
-                            <option value="7">
-                            <option value="8">
-                            <option value="9">
-                            <option value="10">
+                        <input list="CombatRating" id="CR" name="browser" min=".125" max="30" style="width:60%" required>
+                        <datalist id="CombatRating">
+                            <option value=.125>
+                            <option value=.25>
+                            <option value=.5>
+                            <option value=1>
+                            <option value=2>
+                            <option value=3>
+                            <option value=4>
+                            <option value=5>
+                            <option value=6>
+                            <option value=7>
+                            <option value=8>
+                            <option value=9>
+                            <option value=10>
                             <option value="11">
                             <option value="12">
                             <option value="13">
@@ -273,14 +273,14 @@ button {width:100px; text-align:justify}
                             <option value="20">
                         </datalist>
                         <!--<input type="number" id="cr" value="10" min=".1" style="width:60%" required />-->
-                        </textarea><i class="fa fa-question" data-tooltip="CR is used here to de"></i>
+                        </textarea><i class="fa fa-question" data-tooltip="CR is used here to determine the difficulty rating of the combattant. This value will also determine the morale of the combattant."></i>
                     </td>
                 </tr>
             </table>
             <br />
             <input type="number" id="numberOfC" value="1" min="1" style="width:4em" />
             <button onclick="AddC()"><i class="fa fa-shopping-cart"></i> Add</button>
-            <button onclick="clearC()"> <i class="fa fa-trash-o"></i>Clear</button>
+            <button onclick="clearC()"> <i class="fa fa-trash-o"></i>Reset</button>
         <!-- change function and params before uncommenting<button onclick='initial();console.log("cleared");$("#lineup").html("")'>
         <i class="fa fa-trash-o"></i>
         Clear Fields

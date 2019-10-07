@@ -6,6 +6,8 @@
     console.log('we don"t have jquery');
 } */
 
+// hosted
+
 function flip(name,way) {
 	if (way ==1) {
 	$("#OFF_"+name).show();
@@ -164,44 +166,149 @@ function AddC() {
     var newbie = {};
     var numberOf = $("#numberOfC").val();
 
-	$("#table").find('input').each(function(index, element) {
-        key=$(this).attr('id');
-		var v=$("#"+key).val();
-		if (!!v) {newbie[key]=$("#"+key).val();}
-			//$("#"+key).val("");
+    $("#table").find('input').each(function (index, element) {
+        key = $(this).attr('id');
+        var v = $("#" + key).val();
+
+        // if the value is not null
+        if (!!v) {
+            // record the value of CR
+            newbie[key] = v;
+            // get value of BR/Morale from CR and store value
+            if (key == "CR") {
+                key = "BR";//this could also be "morale"
+                v = calcBR(v);
+                newbie[key] = v;
+            };
+        };
+
     });
 
     for (var x = 0; x < numberOf; x++) {
         Add(newbie);
     }
-	$("#confC").show("slow");
-	$("#confC").hide("slow");
+    $("#confC").show("slow");
+    $("#confC").hide("slow");
+}
+
+function calcBR(v) {
+    if (v > 5) {
+        var t;
+        // sans equation, so have to do with a switch to find BR.
+        switch (v) {
+            case "6":
+                t = 7;
+                break;
+            case "7":
+                t = 8;
+                break;
+            case "8":
+                t = 9;
+                break;
+            case "9":
+                t = 10.5;
+                break;
+            case "10":
+                t = 12;
+                break;
+            case "11":
+                t = 14;
+                break;
+            case "12":
+                t = 15;
+                break;
+            case "13":
+                t = 16.5;
+                break;
+            case "14":
+                t = 18;
+                break;
+            case "15":
+                t = 20;
+                break;
+            case "16":
+                t = 22;
+                break;
+            case "17":
+                t = 24;
+                break;
+            case "18":
+                t = 27;
+                break;
+            case "19":
+                t = 30;
+                break;
+            case "20":
+                t = 33;
+                break;
+            case "21":
+                t = 36;
+                break;
+            case "22":
+                t = 40;
+                break;
+            case "23":
+                t = 44;
+                break;
+            case "24":
+                t = 48;
+                break;
+            case "25":
+                t = 55;
+                break;
+            case "26":
+                t = 68;
+                break;
+            case "27":
+                t = 81;
+                break;
+            case "28":
+                t = 95;
+                break;
+            case "29":
+                t = 110;
+                break;
+            case "30":
+                t = 126;
+                break;
+        }
+
+        v = t;
+    }
+    return v;
 }
 
 function clearC() {
+    // Resets the input values to default value, if one is assined else, makes field blank.
+
     $("#table").find('input').each(function (index, element) {
         key = $(this).attr('id');
-        $("#"+key).val("");
-    });
-}
-	
-function initial() {
-	$("#def").keyup(function(event){if(event.keyCode == 13){AddB();}}); // keycode 13 is "enter"
-	$("#confA").hide();
-	$("#confB").hide();
-	$("#confC").hide();
-	$("#failB").hide();
-	sessionStorage.setItem('lineup', JSON.stringify([]));
-	$("#OFF_more").hide();
-	$("#OFF_work").hide();
-	$("#OFF_link").hide();
-	$("#OFF_motive").hide();
-	$("#OFF_future").hide();
-	$("#OFF_setup").hide();
-	$("#ON_result").hide();
-	$("#DIV_result").hide();
-	$("#OUT_sample").hide();
-	}
-	
-$( document ).ready(initial) 
+        defaultVal = $(this).attr('value');
 
+        // if the field has a default value, reset it
+        if (!!defaultVal) {
+            $("#" + key).val(defaultVal);
+        }
+        else { $("#" + key).val(""); } // else clear value
+    })
+}
+
+function initial() {
+    $("#def").keyup(function (event) { if (event.keyCode == 13) { AddB(); } });
+    $("#confA").hide();
+    $("#confB").hide();
+    $("#confC").hide();
+    $("#failB").hide();
+    sessionStorage.setItem('lineup', JSON.stringify([]));
+    $("#OFF_more").hide();
+    $("#OFF_work").hide();
+    $("#OFF_link").hide();
+    $("#OFF_motive").hide();
+    $("#OFF_future").hide();
+    $("#OFF_setup").hide();
+    $("#ON_result").hide();
+    $("#DIV_result").hide();
+    $("#OUT_sample").hide();
+}
+
+$(document).ready(initial) 

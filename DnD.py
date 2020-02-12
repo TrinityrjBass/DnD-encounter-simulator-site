@@ -396,6 +396,7 @@ class Creature:
             self.hd = Dice(self.ability_bonuses['con'], 8, avg=True, role="hd")
 
         # Get HP
+        print("getting HP value")
         if 'hp' in self.settings.keys():
             self.hp = int(self.settings['hp'])
             self.starting_hp = self.hp
@@ -404,6 +405,7 @@ class Creature:
         else:
             raise Exception('Cannot make character without hp or hd + level provided')
 
+        print("getting ac, initiative, spell ability bonus...")
         # AC
         if not 'ac' in self.settings.keys():
             self.settings['ac'] = 10 + self.ability_bonuses['dex']
@@ -439,6 +441,7 @@ class Creature:
             # not a healer
 
         # attacks
+        print("loading attack information")
         self.attacks = []
         self.hurtful = 0
         if not 'attack_parameters' in self.settings:
@@ -488,11 +491,11 @@ class Creature:
         #Also... I really (like REALLY) wanna break this out into its own method, and that may be the best option in case a creature does not have max_morale
         self.max_morale = int(self.settings['max_morale'])
         self.current_morale = int(self.settings['max_morale'])
-
+        print("getting Morale value")
         if self.settings['max_morale'] =='' or int(self.settings['max_morale']) == 0: # if custom combattant, get CR and find proper morale
             morale = 0
             # if morale is 0 or null, then check the CR and figure BR from that (do I need a fallback option?)
-            _cr = int(self.settings['cr'])
+            _cr = int(self.settings['CR'])
             if _cr < 5:
                 morale = 1
             elif _cr > 1 & _cr < 6: # may be unnecessarily  specific
@@ -529,6 +532,7 @@ class Creature:
         else:
             self.alt_attack = {'name': None, 'attack': None}
         # last but not least
+        print("Assessing alignment")
         if 'alignment' not in self.settings:
             self.settings['alignment'] = "unassigned mercenaries"  # hahaha!
         self.alignment = self.settings['alignment']
@@ -633,6 +637,7 @@ class Creature:
         """
         self.able = 1  # has abilities. if nothing at all is provided it goes to zero. This is for rocks...
         # set blanks
+        print("loading ability scores")
         self.ability_bonuses = {n: 0 for n in self.ability_names} #default for no given ability score is 10 (bonus = 0) as per manual.
         self.abilities = {n: 10 for n in self.ability_names}
         for ability in self.settings['abilities']: #a dictionary within a dictionary
@@ -642,6 +647,7 @@ class Creature:
                     'but they differ ({0}: 10+{1}*2 vs. {2})'.format(ability,self.settings['ability_bonuses'][ability], self.settings['abilities'][ability]))
             self.abilities[ability] = int(self.settings['abilities'][ability])
             self.ability_bonuses[ability] = math.floor(int(self.settings['abilities'][ability])/2-5)
+        print("calculating ability modifiers")
         for ability in self.settings['ability_bonuses']:
             self.ability_bonuses[ability] = self.settings['ability_bonuses'][ability]
             self.abilities[ability] = 10 + 2 * self.ability_bonuses[ability] #I know it means nothing, but I am unsure why this was absent.
@@ -949,7 +955,8 @@ class Creature:
         if verbose: verbose.append(self.name + self.id + ' took ' + str(points) + ' damage. Now on ' + str(self.hp) + ' hp.')
             
         # Morale Check for bloodied
-        if self.hp < self.starting_hp/2: self.current_morale -= 1 # this will cause it to lose morale EVERY TURN while it's bloodied,
+        if self.hp < self.starting_hp/2: 
+            self.current_morale -= 1 # this will cause it to lose morale EVERY TURN while it's bloodied,
 
         if points > 10 : self.current_morale -= 1 # pseudo critical hit
         if verbose: verbose.append(self.name + self.id + ' is at ' + str(self.current_morale) + ' morale.')
@@ -1057,6 +1064,8 @@ class Creature:
                 # self.attacks[i]['damage'].crit = self.attacks[i]['attack'].crit  #Pass the crit if present.
                 h = self.attacks[i]['damage'].roll(verbose)
                 opponent.take_damage(h, verbose)
+                # check to see if the opponent survived the last hit, if not, win
+                if opponent.hp < 1 : raise self.arena.Victory()
                 self.tally['damage'] += h
                 self.tally['hits'] += 1
             else:
@@ -1201,6 +1210,7 @@ class Encounter:
         self.combattants = []
         self.sides = ''
         for chap in lineup:
+
             self.append(chap)
             # this used to be self.append(chap) was getting an err that "name" did not exist
             # /facepalm... append() is not built-in, need to follow code (2nd method down) to chase the "no attribute'alignment'" error

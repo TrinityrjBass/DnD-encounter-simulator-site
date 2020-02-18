@@ -92,7 +92,8 @@ function Output (text) {
 	}
 
 function duel() {
-console.log(sessionStorage.getItem('lineup'));
+var lineup = sessionStorage.getItem('lineup')
+console.log(lineup);
 flip("result",1)
 document.getElementById("status").innerHTML="<i class='fa fa-spinner fa-pulse'></i> Simulation in progress.";
 xmlhttp=new XMLHttpRequest();
@@ -103,7 +104,7 @@ xmlhttp.onreadystatechange=function()
   }
 xmlhttp.open("POST","wsgi.py",true);
 xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-xmlhttp.send(sessionStorage.getItem('lineup'));
+xmlhttp.send(lineup);
 }
 
 function Add(newbie) {

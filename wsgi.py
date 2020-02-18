@@ -6,6 +6,7 @@ import DnD
 import threading, time
 
 
+
 class TimeoutError(Exception):
     pass
 
@@ -15,8 +16,8 @@ if __name__ == '__main__':
     apppath=""
 else:
     place="server"
-    host=8051
-    apppath="app-root/repo/"
+    host=8000 # used to be 8051
+    apppath="" #"app-root/repo/"
 print(place)
 DnD.Creature.beastiary=DnD.Creature.load_beastiary(apppath+'beastiary.csv')
 
@@ -53,9 +54,9 @@ def add_to_tales(battle):
 
 def getter(environ, start_response):
     ctype = 'text/plain'
-    if not environ['PATH_INFO']:  #this never happens.! I thought it did, but it was an ecoding error
-        ctype,response_body=sendindex()
-    elif environ['PATH_INFO'] == '/health':
+    #if not environ['PATH_INFO']:  #this never happens.! I thought it did, but it was an ecoding error
+    #    ctype,response_body=sendindex()
+    if environ['PATH_INFO'] == '/health':
         response_body = "1"
     elif environ['PATH_INFO'] == '/review':
         response_body = sendreviewpage()
@@ -112,7 +113,7 @@ def poster(environ, start_response):              #If POST...
     try:
         l = json.loads(str(request_body)[2:-1])
         wwe = DnD.Encounter(*l)
-        w=threading.Thread(target=wwe.go_to_war,args=(1000,))
+        w=threading.Thread(target=wwe.go_to_war,args=(5,)) #default is 1000, changing to 5 for debugging
         w.start()
         time.sleep(10)
         wwe.KILL = True
@@ -129,7 +130,12 @@ def poster(environ, start_response):              #If POST...
     start_response(status, response_headers)
     return [response_body]
 
+# comment out when deploying to "real" web server?
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
     httpd = make_server('localhost', host, application)
     httpd.serve_forever()
+
+#hopefully this will provide something for Docker to find, and then direct it to the right function.
+class Application():
+    application(environ, start_response)

@@ -445,12 +445,12 @@ class Creature:
         self.attacks = []
         self.hurtful = 0
         if not 'attack_parameters' in self.settings:
-            # Benefit of doubt. Given 'em a dagger .
+            # Benefit of doubt. Given 'em a dagger . <-- but if you give them a dagger... then they will never use their fist (listed below)
             self.settings['attack_parameters'] = 'dagger'
         if type(self.settings['attack_parameters']) is str:
             try:
                 import json
-                x = json.loads(self.settings['attack_parameters'].replace("*", "\""))
+                x = json.loads(self.settings['attack_parameters'].replace("*", "\""))  # Break here to see what's going on with parsing attack parameters
                 self._attack_parse(x)
                 self.attack_parameters = x
             except:
@@ -496,8 +496,8 @@ class Creature:
             morale = 0
             # if morale is 0 or null, then check the CR and figure BR from that (do I need a fallback option?)
             _cr = int(self.settings['CR'])
-            if _cr < 5:
-                morale = 1
+            if _cr < 2:
+                morale = 1 # I think having CR0 - CR2 have BR == 2 would work
             elif _cr > 1 & _cr < 6: # may be unnecessarily  specific
                 morale = _cr 
             elif _cr > 5 & _cr <= 9: # may be unnecessarily  specific
@@ -1209,12 +1209,25 @@ class Encounter:
         self.note = ''
         self.combattants = []
         self.sides = ''
+        
         for chap in lineup:
-
-            self.append(chap)
-            # this used to be self.append(chap) was getting an err that "name" did not exist
-            # /facepalm... append() is not built-in, need to follow code (2nd method down) to chase the "no attribute'alignment'" error
+            if type(chap) is dict:
+                print("Custom Combattant detected, attempting to add to combattant list")
+                newChap = Creature(chap)
+                self.append(newChap)
+            else:
+                self.append(chap)
         self.blank()
+
+    ##def _addCombattants(self, lineup):
+    #    for chap in lineup:
+    #        if type(chap) is dict:
+    #            # TODO cope with dictionary input from custom combattant 
+    #            print("Custom Combattant detected, attempting to add to combattant list")
+    #            newChap = Creature(chap)
+    #            self.append(newChap)
+    #        else:
+    #            self.append(chap)
 
     def blank(self, hard=True):
         # this resets the teams
@@ -1229,12 +1242,13 @@ class Encounter:
 
 
     def append(self, newbie):
-        print("appending " + newbie + str(len(self.combattants))) #debugging
+        #print("appending " + newbie + str(len(self.combattants))) #debugging
         if not type(newbie) is Creature:
-            newbie = Creature(newbie)  # Is this safe??
+            newbie = Creature(newbie)  # Is this safe?? ... does this ever get hit?
+        newbie.id = str(len(self.combattants)) #this should be in the beginning of the method
         self.combattants.append(newbie)
         newbie.arena = self
-        newbie.id = str(len(self.combattants))
+        
         self.blank()
 
     def extend(self, iterable):

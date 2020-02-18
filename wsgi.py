@@ -17,7 +17,7 @@ if __name__ == '__main__':
 else:
     place="server"
     host=8000 # used to be 8051
-    apppath="" #"app-root/repo/"
+    apppath="/home/site/wwwroot" #"app-root/repo/"
 print(place)
 DnD.Creature.beastiary=DnD.Creature.load_beastiary(apppath+'beastiary.csv')
 
@@ -131,11 +131,14 @@ def poster(environ, start_response):              #If POST...
     return [response_body]
 
 # comment out when deploying to "real" web server?
-if __name__ == '__main__':
-    from wsgiref.simple_server import make_server
-    httpd = make_server('localhost', host, application)
-    httpd.serve_forever()
+#if __name__ == '__main__':
+#    from wsgiref.simple_server import make_server
+#    httpd = make_server('localhost', host, application)
+#    httpd.serve_forever()
 
 #hopefully this will provide something for Docker to find, and then direct it to the right function.
-class Application():
-    application(environ, start_response)
+class Application(object):
+    def __init__(self, environ, start_fn):
+        start_fn(application(environ, start_response))
+
+    app = Application()

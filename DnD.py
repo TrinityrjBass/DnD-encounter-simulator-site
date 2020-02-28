@@ -450,7 +450,7 @@ class Creature:
         if type(self.settings['attack_parameters']) is str:
             try:
                 import json
-                x = json.loads(self.settings['attack_parameters'].replace("*", "\""))  # Break here to see what's going on with parsing attack parameters
+                x = json.loads(self.settings['attack_parameters'].replace("*", "\""))  
                 self._attack_parse(x)
                 self.attack_parameters = x
             except:
@@ -1026,10 +1026,11 @@ class Creature:
     def cast_nothing(self, state='activate'):  # Something isn't quite right if this is invoked.
         pass
 
-    def heal(self, points, verbose=0):
+    def heal(self, points, verbose=1):
         self.hp += points
         self.current_morale +=  1
         if verbose: verbose.append(self.name + ' was healed by ' + str(points) + '. Now on ' + str(self.hp) + ' hp.')
+        if verbose: verbose.append(self.name + ' got a morale boost from getting healed and is now at ' + str(self.current_morale) + ' morale.')
 
     def assess_wounded(self, verbose=0):
         targets = self.arena.find('bloodiest allies')

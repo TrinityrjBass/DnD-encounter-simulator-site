@@ -57,11 +57,25 @@ function flip(name, way) {
     }
 }
 
+//function duel_t() {
+//    $.ajax({
+//        method: "POST",
+//        url: "",
+//        data: []
+//    })
+//        .done(function (msg) {
+//            alert("Data Saved: " + msg);
+//        });
+//}
+
 function duel_t() {
+    var lineup = sessionStorage.getItem('lineup')
     $.ajax({
-        method: "POST",
-        url: "",
-        data: []
+        type: "POST",
+        contentType: 'application/json',
+        url: "/poster/",
+        dataType: 'json',
+        data: JSON.stringify(lineup)
     })
         .done(function (msg) {
             alert("Data Saved: " + msg);
@@ -137,8 +151,9 @@ function duel() {
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) { Output(xmlhttp.responseText); }
     }
-    xmlhttp.open("POST", "wsgi.py", true);
-    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.open("POST", "/poster/", true); // formerly : "POST", "wsgi.py", true
+    // xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.setRequestHeader("Content-type", "application/json");
     xmlhttp.send(lineup);
 }
 
@@ -220,10 +235,6 @@ function figureAtkParams() {
     // call method to figure Damage modifier
 }
 
-function getDmgDice() {
-    var dice
-}
-
 function weaponDice() {
     var w = $("#weapon").val();
     for (var arm in armory) {
@@ -249,7 +260,8 @@ function queueAttack() {
 
 function saveAttack() {
     // move attack list to attack parameters field in custom combatant
-    $("#attack_parameters").val($("#attacks").text());
+    var s = '[' + $("#attacks").text() + ']';
+    $("#attack_parameters").val(s);
 }
 
 function clearAttacks() {

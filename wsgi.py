@@ -121,18 +121,17 @@ def getter(environ, start_response):
 def poster():              #If POST...
     #from cgi import parse_qs
     print("Poster");
-    list = json.loads(request.form)
-    print("request form as string : " + list)
-    print()
+    #print()
     request_body = ""
+    list = tuple(request.form.items())[0][0]
+    # might be able to use .items() off a dictionary obj may work
     try:
-        request_body_size = requestl.environ['CONTENT_LENGTH']
+        request_body_size = request.environ['CONTENT_LENGTH']
         print("body size : " + request_body_size)
-        print("request body : " + request.form.read(request_body_size))
+        print("list : " + list)
+        #list = json.loads(request.json)
+        #print("request body : " + request.form.read(request_body_size))
         #request_body = request.environ['wsgi.input'].read(request_body_size)
-        for entry in request.form:
-            request_body += entry
-        print(request_body)
     except (TypeError, ValueError):
         request_body = "0"
         print("No request found")
@@ -141,8 +140,10 @@ def poster():              #If POST...
     #value = parsed_body.get('test_text', [''])[0] #Returns the first value
 
     try:
-        l = json.loads(str(request_body)[2:-1])
-        print("l : " + l)
+        
+        #l = json.loads(str(request_body)[2:-1])
+        l = json.loads(list)
+        # print("l : " + l)
         wwe = DnD.Encounter(*l)
         w=threading.Thread(target=wwe.go_to_war,args=(5,)) #default is 1000, changing to 5 for testing
         w.start()

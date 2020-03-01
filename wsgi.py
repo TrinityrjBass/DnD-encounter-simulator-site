@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import os
 import sys
 import json
@@ -13,10 +13,15 @@ class TimeoutError(Exception):
 
 app = Flask(__name__)
 
-@app.route(('/<string:page_name>/'))
+@app.route('/<string:page_name>/', methods=['GET', 'POST'])
 def render_static(page_name):
-    sendindex()
-    return render_template('%s.html' % page_name)
+    print(request.method);
+    if request.method == 'GET':
+        return (sendindex())
+    if request.method == 'POST':
+        return (poster(start_response))
+    #return render_template('static.html')
+#'%s.html' % page_name
 
 if __name__ == '__main__':
     place="local"
@@ -30,25 +35,29 @@ print(place)
 DnD.Creature.beastiary=DnD.Creature.load_beastiary(apppath+'beastiary.csv')
 
 def application(environ, start_response):
+    # pretty sure I'm slowly deprecating this method
     sys.stdout =environ['wsgi.errors']
     if environ['REQUEST_METHOD'] == 'POST':
-        return poster(environ, start_response)
+        return poster(start_response)
     else:  #get
         return getter(environ, start_response)
 
 def sendindex():
-    print("SendIndex");
+    print("SendIndex")
     #Add creatures from bestiary to dropdown selection 
     DnD.Creature.beastiary=DnD.Creature.load_beastiary(apppath+'beastiary.csv')
     ctype = 'text/html'
     h=open(apppath+"static.html")
     response_body = h.read()
     x='<!--serverside values-->'
+    #read creatures in from beastiary
     for name in sorted([DnD.Creature.beastiary[beast]['name'] for beast in DnD.Creature.beastiary],key=str.lower):
-        x+='<option value="'+name+'">'+name+'</option>'
+        x+='<option value="'+name+'">'+name+'</option>,'
+    x.split(',')
     response_body=response_body.replace("<!--LABEL-->",x)
     response_body = response_body.encode('utf-8')
-    return ctype, response_body
+    #print(response_body)
+    return response_body
 
 def line_prepender(filename, line):
     with open(filename, 'r+', encoding='utf-8') as f:
@@ -108,11 +117,22 @@ def getter(environ, start_response):
     start_response(status, response_headers)
     return [response_body]
 
-def poster(environ, start_response):              #If POST...
+@app.route('/poster/', methods=['POST'])
+def poster():              #If POST...
     #from cgi import parse_qs
+    print("Poster");
+    list = json.loads(request.form)
+    print("request form as string : " + list)
+    print()
+    request_body = ""
     try:
-        request_body_size = int(environ['CONTENT_LENGTH'])
-        request_body = environ['wsgi.input'].read(request_body_size)
+        request_body_size = requestl.environ['CONTENT_LENGTH']
+        print("body size : " + request_body_size)
+        print("request body : " + request.form.read(request_body_size))
+        #request_body = request.environ['wsgi.input'].read(request_body_size)
+        for entry in request.form:
+            request_body += entry
+        print(request_body)
     except (TypeError, ValueError):
         request_body = "0"
         print("No request found")
@@ -122,8 +142,9 @@ def poster(environ, start_response):              #If POST...
 
     try:
         l = json.loads(str(request_body)[2:-1])
+        print("l : " + l)
         wwe = DnD.Encounter(*l)
-        w=threading.Thread(target=wwe.go_to_war,args=(5,)) #default is 1000, changing to 5 for debugging
+        w=threading.Thread(target=wwe.go_to_war,args=(5,)) #default is 1000, changing to 5 for testing
         w.start()
         time.sleep(10)
         wwe.KILL = True
@@ -137,8 +158,12 @@ def poster(environ, start_response):              #If POST...
     response_body = response_body.encode('utf-8')
     status = '200 OK'
     response_headers = [('Content-Type', ctype), ('Content-Length', str(len(response_body)))]
-    start_response(status, response_headers)
-    return [response_body]
+    #start_response(status, response_headers)
+    # The view function did not return a valid response. 
+    # The return type must be a string, dict, tuple, Response instance, or WSGI callable, but it was a list.
+    print("resopnse body : " + str(response_body))
+
+    return response_body
 
 # comment out when deploying to "real" web server?
 if __name__ == '__main__':

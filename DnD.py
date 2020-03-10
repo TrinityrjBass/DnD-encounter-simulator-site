@@ -13,7 +13,7 @@ N = "<br/>"
 TARGET = 'enemy alive weakest'
 # target='enemy alive weakest', target='enemy alive random', target='enemy alive fiersomest'
 
-
+# make Verbose a variable to be set at the top????
 """
 This module allows the simulation of a D&D encounter.
 It has three main classes:  Dice, Character, Encounter.
@@ -165,7 +165,7 @@ class Dice:
             if verbose: verbose.append("Fumble!")
             return -999  # automatic fail
         elif result == 20:
-            if verbose: verbose.append("Crit!")
+            if verbose: verbose.append("Critically hit!")
             if self.twinned: self.twinned.crit = 1
             return 999  # automatic hit.
         else:
@@ -243,6 +243,8 @@ class Creature:
         * AB_Int
         * AB_Wis
         * AB_Cha
+        * max_morale
+        * current_morale
         """
         try:
             import csv
@@ -314,11 +316,15 @@ class Creature:
         9. spellcasting (complex, may change in future): `sc_ab` the spellcasting ability as three char str,
         10. `initiative_bonus`
         11. combat stats... attack_parameters=[['rapier', 4, 2, 8]], alt_attack=['net', 4, 0, 0]
+        12. set max morale
+        13. id. This should be able to be used to single out one combattant of many for the purpose of death/retreat
 
         name, alignment="good", ac=10, initiative_bonus=None, hp=None, attack_parameters=[['club', 2, 0, 4]],
                  alt_attack=['none', 0],
                  healing_spells=0, healing_dice=4, healing_bonus=None, ability_bonuses=[0, 0, 0, 0, 0, 0], sc_ability='wis',
                  buff='cast_nothing', buff_spells=0, log=None, xp=0, hd=6, level=1, proficiency=2
+
+       Should add Morale/BR here too.
                  """
 
         if settings:
@@ -354,6 +360,7 @@ class Creature:
         self._set('name', 'nameless')
         self._set('level', 0, 'int')
         self._set('xp', None, 'int')
+        self.id = 0 # should get overwritten when loaded into combattants list.
 
         # proficiency. Will be overridden if not hp is provided.
         self._set('proficiency', 1 + round(self.level / 4))  # TODO check maths on PH
@@ -389,6 +396,7 @@ class Creature:
             self.hd = Dice(self.ability_bonuses['con'], 8, avg=True, role="hd")
 
         # Get HP
+        print("getting HP value")
         if 'hp' in self.settings.keys():
             self.hp = int(self.settings['hp'])
             self.starting_hp = self.hp
@@ -397,6 +405,7 @@ class Creature:
         else:
             raise Exception('Cannot make character without hp or hd + level provided')
 
+        print("getting ac, initiative, spell ability bonus...")
         # AC
         if not 'ac' in self.settings.keys():
             self.settings['ac'] = 10 + self.ability_bonuses['dex']
@@ -432,15 +441,17 @@ class Creature:
             # not a healer
 
         # attacks
+        print("loading attack information")
         self.attacks = []
         self.hurtful = 0
         if not 'attack_parameters' in self.settings:
-            # Benefit of doubt. Given 'em a dagger .
+            # Benefit of doubt. Given 'em a dagger . <-- but if you give them a dagger... then they will never use their fist (listed below)
             self.settings['attack_parameters'] = 'dagger'
         if type(self.settings['attack_parameters']) is str:
             try:
                 import json
-                x = json.loads(self.settings['attack_parameters'].replace("*", "\""))
+                # x = json.loads(self.settings['attack_parameters'].replace("*", "\""))
+                x = self.settings['attack_parameters']
                 self._attack_parse(x)
                 self.attack_parameters = x
             except:
@@ -475,13 +486,67 @@ class Creature:
             self._attack_parse(self.attack_parameters)
         else:
             raise Exception('Could not determine weapon')
-        ##Weird bit needing upgrade.
+
+        if 'cr' in self.settings: 
+            self.cr = self.settings['cr']
+        else:
+            self.settings['cr'] = 1 # Use 1 as a default value if none is given
+            # self.cr = 1
+        # Check/set Morale
+        #this is where the value is validated or found and assigned max_morale
+        # BREAK OUT INTO OWN METHOD
+        # could do cr and br assignments in one block. If there is no Cr, there's not going to be a Br
+        if 'br' in self.settings:
+            self.max_morale = int(self.settings['br'])
+            self.current_morale = int(self.settings['br'])
+        else : 
+            self.settings['max_morale'] = 0
+            self.max_morale = 0
+            self.current_morale = 0
+            
+        print("getting Morale value")
+        # IF creature is not in Beasiary or if Custom Combatant is given
+        if self.max_morale =='' or int(self.max_morale) == 0: # if custom combattant, get CR and find proper morale
+            morale = 0
+            # if morale is 0 or null, then check the CR and figure BR from that (do I need a fallback option?)
+            _cr = int(self.settings['cr']) #error regarding non-whole numbers should get resolved if/when the scale gets changed
+            if _cr < 2:
+                morale = 1 # I think having CR0 - CR2 have BR == 2 would work
+            elif _cr > 1 & _cr < 6: # may be unnecessarily  specific
+                morale = _cr 
+            elif _cr > 5 & _cr < 10: 
+                morale = _cr + 1
+            elif _cr == 10:
+                morale = 12
+            elif _cr == 11:
+                morale = 14
+            elif _cr == 12:
+                morale = 15
+            elif _cr == 13:
+                morale = 16
+            elif _cr == 14:
+                morale = 18
+            elif _cr == 15:
+                morale = 20
+            elif _cr > 15:
+                morale = 99 # 99 for testing
+            # up to CR 15 is good enough for testing
+
+            # setup max morale and set current morale to max morale (since they start out at max)
+            # self.settings['max_morale'] = morale 
+            # self.settings['current_morale'] = morale 
+            self.current_morale = morale
+            self.max_morale = morale
+            
+
+        ## Weird bit needing upgrade.
         if 'alt_attack' in self.settings and type(self.settings['alt_attack']) is list:
             self.alt_attack = {'name': self.settings['alt_attack'][0],
                                'attack': Dice(self.settings['alt_attack'][1], 20)}  # CURRENTLY ONLY NETTING IS OPTION!
         else:
             self.alt_attack = {'name': None, 'attack': None}
         # last but not least
+        print("Assessing alignment")
         if 'alignment' not in self.settings:
             self.settings['alignment'] = "unassigned mercenaries"  # hahaha!
         self.alignment = self.settings['alignment']
@@ -586,6 +651,7 @@ class Creature:
         """
         self.able = 1  # has abilities. if nothing at all is provided it goes to zero. This is for rocks...
         # set blanks
+        print("loading ability scores")
         self.ability_bonuses = {n: 0 for n in self.ability_names} #default for no given ability score is 10 (bonus = 0) as per manual.
         self.abilities = {n: 10 for n in self.ability_names}
         for ability in self.settings['abilities']: #a dictionary within a dictionary
@@ -595,6 +661,7 @@ class Creature:
                     'but they differ ({0}: 10+{1}*2 vs. {2})'.format(ability,self.settings['ability_bonuses'][ability], self.settings['abilities'][ability]))
             self.abilities[ability] = int(self.settings['abilities'][ability])
             self.ability_bonuses[ability] = math.floor(int(self.settings['abilities'][ability])/2-5)
+        print("calculating ability modifiers")
         for ability in self.settings['ability_bonuses']:
             self.ability_bonuses[ability] = self.settings['ability_bonuses'][ability]
             self.abilities[ability] = 10 + 2 * self.ability_bonuses[ability] #I know it means nothing, but I am unsure why this was absent.
@@ -772,7 +839,9 @@ class Creature:
                              alt_attack=['none', 0],
                              healing_spells=99999, healing_dice=1, healing_bonus=30,
                              ability_bonuses=[56, 21, 45, 31, 36, 34], sc_ability='wis',
-                             buff='cast_nothing', buff_spells=0, log=None, hd=8, level=36, proficiency=27)
+                             buff='cast_nothing', buff_spells=0, log=None, hd=8, level=36, proficiency=27,
+                             br=99)
+
 
         else:
             self._initialise(name="Commoner", alignment="evil",
@@ -818,6 +887,8 @@ class Creature:
         :param attributes: key value pair
         :return: None
         """
+
+        # may need to add Morale here??
         for attr in abilities:
             attr = attr[0:3].lower() #just in case
             if attr in self.abilities:
@@ -873,6 +944,7 @@ class Creature:
             self.hurtful += (sum(x['damage'].dice) + len(
                 x['damage'].dice)) / 2  # the average roll of a d6 is not 3 but 3.5
 
+    # Another place where Morale may need to be added
     def __str__(self):
         if self.tally['battles']:
             battles = self.tally['battles']
@@ -888,18 +960,32 @@ class Creature:
         else:
             return self.name + ": UNTESTED IN BATTLE"
 
+        # Morale may be needed to be factored in here too
     def isalive(self):
         if self.hp > 0: return 1
 
-    def take_damage(self, points, verbose=0):
+    def take_damage(self, points, verbose=1):
         self.hp -= points
-        if verbose: verbose.append(self.name + ' took ' + str(points) + ' of damage. Now on ' + str(self.hp) + ' hp.')
-        if self.concentrating:
-            dc = points / 2
-            if dc < 10: dc = 10
-            if Dice(self.ability_bonuses[self.sc_ab]).roll() < dc:
-                self.conc_fx()
-                if verbose: verbose.append(self.name + ' has lost their concentration')
+        if verbose: verbose.append(self.name + self.id + ' took ' + str(points) + ' damage. Now on ' + str(self.hp) + ' hp.')
+            
+        # Morale Check for bloodied
+        if self.hp < self.starting_hp/2: 
+            self.current_morale -= 1 # this will cause it to lose morale EVERY TURN while it's bloodied,
+
+        if points > 10 : self.current_morale -= 1 # pseudo critical hit
+        if verbose: verbose.append(self.name + self.id + ' is at ' + str(self.current_morale) + ' morale.')
+
+        # if morale gets to be 0 or less, remove from combattants list (run away), else check if concentrating.
+        if self.current_morale < 1 : 
+            self.hp = 0 #psuedo death (running away)
+            if verbose: verbose.append(self.name + self.id + ' lost its desire to fight and ran away from battle')
+        else : 
+            if self.concentrating:
+                dc = points / 2
+                if dc < 10: dc = 10
+                if Dice(self.ability_bonuses[self.sc_ab]).roll() < dc:
+                    self.conc_fx()
+                    if verbose: verbose.append(self.name + ' has lost their concentration')
 
     def ready(self):
         self.dodge = 0
@@ -912,7 +998,9 @@ class Creature:
         :param hard: bool, false keeps tallies
         :return: None
         """
+        
         self.hp = self.starting_hp
+        self.current_morale = self.max_morale
         if self.concentrating:
             self.conc_fx() #TODO this looks fishy
         self.healing_spells = self.starting_healing_spells
@@ -952,9 +1040,11 @@ class Creature:
     def cast_nothing(self, state='activate'):  # Something isn't quite right if this is invoked.
         pass
 
-    def heal(self, points, verbose=0):
+    def heal(self, points, verbose=1):
         self.hp += points
+        self.current_morale +=  1
         if verbose: verbose.append(self.name + ' was healed by ' + str(points) + '. Now on ' + str(self.hp) + ' hp.')
+        if verbose: verbose.append(self.name + ' got a morale boost from getting healed and is now at ' + str(self.current_morale) + ' morale.')
 
     def assess_wounded(self, verbose=0):
         targets = self.arena.find('bloodiest allies')
@@ -989,6 +1079,8 @@ class Creature:
                 # self.attacks[i]['damage'].crit = self.attacks[i]['attack'].crit  #Pass the crit if present.
                 h = self.attacks[i]['damage'].roll(verbose)
                 opponent.take_damage(h, verbose)
+                # check to see if the opponent survived the last hit, if not, win
+                if opponent.hp < 1 : raise self.arena.Victory()
                 self.tally['damage'] += h
                 self.tally['hits'] += 1
             else:
@@ -1126,16 +1218,35 @@ class Encounter:
         self.KILL=False #needed for code.
         self.tally = {'rounds': 0, 'battles': 0, 'perfect': None, 'close': None, 'victories': None}
         self.active = None
+        self.num_combattants = 0
         self.name = 'Encounter'
         self.masterlog = []
         self.note = ''
         self.combattants = []
+        self.sides = ''
+        
         for chap in lineup:
-            self.append(chap)
+            if type(chap) is dict:
+                print("Custom Combattant detected, attempting to add to combattant list")
+                newChap = Creature(chap)
+                self.append(newChap)
+            else:
+                self.append(chap)
         self.blank()
+
+    ##def _addCombattants(self, lineup):
+    #    for chap in lineup:
+    #        if type(chap) is dict:
+    #            # TODO cope with dictionary input from custom combattant 
+    #            print("Custom Combattant detected, attempting to add to combattant list")
+    #            newChap = Creature(chap)
+    #            self.append(newChap)
+    #        else:
+    #            self.append(chap)
 
     def blank(self, hard=True):
         # this resets the teams
+        # This is where The teams are set
         self.sides = set([dude.alignment for dude in self])
         self.tally['battles'] = 0
         self.tally['rounds'] = 0
@@ -1146,10 +1257,13 @@ class Encounter:
 
 
     def append(self, newbie):
+        #print("appending " + newbie + str(len(self.combattants))) #debugging
         if not type(newbie) is Creature:
-            newbie = Creature(newbie)  # Is this safe??
+            newbie = Creature(newbie)  # Is this safe?? ... does this ever get hit?
+        newbie.id = str(len(self.combattants)) #this should be in the beginning of the method
         self.combattants.append(newbie)
         newbie.arena = self
+        
         self.blank()
 
     def extend(self, iterable):
@@ -1236,7 +1350,7 @@ class Encounter:
         """
         if type(moriturus) is str:
             for chap in self.combattants:
-                if chap.name == moriturus:
+                if chap.name == moriturus: # this should be changed to chap.id
                     self.combattants.remove(chap)
                     break
             else:
@@ -1305,6 +1419,7 @@ class Encounter:
         self.tally['battles'] += 1
         if reset: self.reset()
         for schmuck in self: schmuck.tally['battles'] += 1
+        # WTF is "schmuck"? in this context...
         self.roll_for_initiative(self.masterlog)
         while True:
             try:

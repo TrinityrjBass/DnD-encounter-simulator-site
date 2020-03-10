@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from flask import Flask, render_template, request
 import os
 import sys
 import json
@@ -6,8 +7,21 @@ import DnD
 import threading, time
 
 
+
 class TimeoutError(Exception):
     pass
+
+app = Flask(__name__)
+
+@app.route('/<string:page_name>/', methods=['GET', 'POST'])
+def render_static(page_name):
+    print(request.method);
+    if request.method == 'GET':
+        return (sendindex())
+    if request.method == 'POST':
+        return (poster(start_response))
+    #return render_template('static.html')
+#'%s.html' % page_name
 
 if __name__ == '__main__':
     place="local"
@@ -15,29 +29,35 @@ if __name__ == '__main__':
     apppath=""
 else:
     place="server"
-    host=8051
-    apppath="app-root/repo/"
+    host=8080 # used to be 8051
+    apppath="/home/site/wwwroot/" #"app-root/repo/"
 print(place)
 DnD.Creature.beastiary=DnD.Creature.load_beastiary(apppath+'beastiary.csv')
 
 def application(environ, start_response):
+    # pretty sure I'm slowly deprecating this method
     sys.stdout =environ['wsgi.errors']
     if environ['REQUEST_METHOD'] == 'POST':
-        return poster(environ, start_response)
+        return poster(start_response)
     else:  #get
         return getter(environ, start_response)
 
 def sendindex():
+    print("SendIndex")
     #Add creatures from bestiary to dropdown selection 
+    DnD.Creature.beastiary=DnD.Creature.load_beastiary(apppath+'beastiary.csv')
     ctype = 'text/html'
     h=open(apppath+"static.html")
     response_body = h.read()
     x='<!--serverside values-->'
+    #read creatures in from beastiary
     for name in sorted([DnD.Creature.beastiary[beast]['name'] for beast in DnD.Creature.beastiary],key=str.lower):
-        x+='<option value="'+name+'">'+name+'</option>'
+        x+='<option value="'+name+'">'+name+'</option>,'
+    x.split(',')
     response_body=response_body.replace("<!--LABEL-->",x)
     response_body = response_body.encode('utf-8')
-    return ctype, response_body
+    #print(response_body)
+    return response_body
 
 def line_prepender(filename, line):
     with open(filename, 'r+', encoding='utf-8') as f:
@@ -53,9 +73,9 @@ def add_to_tales(battle):
 
 def getter(environ, start_response):
     ctype = 'text/plain'
-    if not environ['PATH_INFO']:  #this never happens.! I thought it did, but it was an ecoding error
-        ctype,response_body=sendindex()
-    elif environ['PATH_INFO'] == '/health':
+    #if not environ['PATH_INFO']:  #this never happens.! I thought it did, but it was an ecoding error
+    #    ctype,response_body=sendindex()
+    if environ['PATH_INFO'] == '/health':
         response_body = "1"
     elif environ['PATH_INFO'] == '/review':
         response_body = sendreviewpage()
@@ -97,11 +117,21 @@ def getter(environ, start_response):
     start_response(status, response_headers)
     return [response_body]
 
-def poster(environ, start_response):              #If POST...
+@app.route('/poster/', methods=['POST'])
+def poster():              #If POST...
     #from cgi import parse_qs
+    print("Poster");
+    #print()
+    request_body = ""
+    #list = tuple(request.form.items())[0][0] #this one stopped working?!?
+    list = "" 
+    # might be able to use .items() off a dictionary obj may work
     try:
-        request_body_size = int(environ['CONTENT_LENGTH'])
-        request_body = environ['wsgi.input'].read(request_body_size)
+        request_body_size = request.environ['CONTENT_LENGTH']
+        print("body size : " + request_body_size)
+        #list = json.loads(request.json)
+        #print("request body : " + request.form.read(request_body_size))
+        #request_body = request.environ['wsgi.input'].read(request_body_size)
     except (TypeError, ValueError):
         request_body = "0"
         print("No request found")
@@ -110,9 +140,13 @@ def poster(environ, start_response):              #If POST...
     #value = parsed_body.get('test_text', [''])[0] #Returns the first value
 
     try:
-        l = json.loads(str(request_body)[2:-1])
+        
+        #l = json.loads(str(request_body)[2:-1])
+        #l = json.loads(str(request.json))
+        l = request.json
+        # print("l : " + l)
         wwe = DnD.Encounter(*l)
-        w=threading.Thread(target=wwe.go_to_war,args=(1000,))
+        w=threading.Thread(target=wwe.go_to_war,args=(1000,)) #default is 1000, changing to 5 for testing
         w.start()
         time.sleep(10)
         wwe.KILL = True
@@ -126,10 +160,23 @@ def poster(environ, start_response):              #If POST...
     response_body = response_body.encode('utf-8')
     status = '200 OK'
     response_headers = [('Content-Type', ctype), ('Content-Length', str(len(response_body)))]
-    start_response(status, response_headers)
-    return [response_body]
+    #start_response(status, response_headers)
+    # The view function did not return a valid response. 
+    # The return type must be a string, dict, tuple, Response instance, or WSGI callable, but it was a list.
+    print("resopnse body : " + str(response_body))
 
+    return response_body
+
+# comment out when deploying to "real" web server?
 if __name__ == '__main__':
-    from wsgiref.simple_server import make_server
-    httpd = make_server('localhost', host, application)
-    httpd.serve_forever()
+    app.run(debug=True, port=8080)
+    #from wsgiref.simple_server import make_server
+    #httpd = make_server('localhost', host, application)
+    #httpd.serve_forever()
+
+#hopefully this will provide something for Docker to find, and then direct it to the right function.
+#class Application(object):
+#    def __init__(self, environ, start_fn):
+#        start_fn(application(environ, start_response))
+
+#    app = Application()

@@ -11,7 +11,7 @@
 // dictionary to hold weapons and their damage dice type. used to compile the new version of attack parameters
 var armory = {
     'club': 4,
-    'greatclub': 8,
+    'great club': 8,
     'dagger': 4,
     'short sword': 6,
     'long sword': 8,
@@ -22,7 +22,7 @@ var armory = {
     'sickle': 4,
     'hand axe': 6,
     'battle axe': 8,
-    'waraxe': 10,
+    'war axe': 10,
     'great axe': 12,
     'javelin': 6,
     'spear': 6,

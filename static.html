@@ -19,16 +19,16 @@ button {width:100px; text-align:justify}
 
 
     </style>
-    <link rel="icon" href="static/favicon.ico" type="image/x-icon"/>
-    <link rel="shortcut icon" href="static/favicon.ico" type="image/x-icon"/>
-    <link rel="stylesheet" href="static/font-awesome-4.4.0/css/font-awesome.min.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="font-awesome-4.4.0/css/font-awesome.min.css">
     <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
-    <script src="static/tether.min.js"></script>
-    <script src="static/drop.min.js"></script>
-    <script src="static/tooltip.min.js"></script>
-    <link rel="stylesheet" href="static/tooltip-theme-arrows.css"/>
+    <script src="tether.min.js"></script>
+    <script src="drop.min.js"></script>
+    <script src="tooltip.min.js"></script>
+    <link rel="stylesheet" href="tooltip-theme-arrows.css"/>
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>-->
-    <script src="static/jquery-2.1.4.min.js"></script>
+    <script src="jquery-2.1.4.min.js"></script>
     <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -40,8 +40,9 @@ button {width:100px; text-align:justify}
 
 
     </script>
-    <script type="text/javascript" src="static/coach.js"></script>
+    <script type="text/javascript" src="coach.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='coach.js')}}"></script>
+    <!--which one of these works?-->
 </head>
 <body>
 <table style="border:0px; margin-left:10%; margin-right:10%; margin-top:2%; width:80%; table-layout:fixed; vertical-align:top">
@@ -49,7 +50,7 @@ button {width:100px; text-align:justify}
         <td colspan="2" style="border:0px; padding: 10px; text-align:center; vertical-align:central">
             <table style="border:0px; width:100%; text-align:center">
                 <tr>
-                    <td style="border:0px; text-align:right"><img src="static/Owlbear.jpg" width="90" height="74"
+                    <td style="border:0px; text-align:right"><img src="Owlbear.jpg" width="90" height="74"
                                                                   alt=""/></td>
                     <td style="border:0px"><h1 style="display:inline">D&D 5e Battle simulator</h1></td>
                     <td style="border:0px; width:15%; text-align:left; ">
@@ -68,7 +69,7 @@ button {width:100px; text-align:justify}
         <td colspan="2" style="border:0px; padding: 20px 100px; text-align:center;"><p
                 style="text-align:justify; text-align-last:center;">
             <span style="float: left; color: #903; font-size: 64px; line-height: 48px; padding-top: 0px; padding-right: 6px; padding-left: 3px; font-family: Georgia;"
-                  }>T</span>HIS online tool calculates the victory probabilities in a D&amp;D encounter. It relies on <a
+                  }>T</span>HIS online tool (is in the project root) calculates the victory probabilities in a D&amp;D encounter. It relies on <a
                 href="https://github.com/matteoferla/DnD-battler" target="_blank" class=external>a python script</a>,
             which simulates an encounter 1,000 times for statistical accuracy. The characters can be inputted in a
             variety of ways ranging from a preset to an incomplete list of parameters, which the code will either
@@ -275,7 +276,7 @@ button {width:100px; text-align:justify}
                             <option value="20">
                         </datalist>
                         <!--<input type="number" id="cr" value="10" min=".1" style="width:60%" required />-->
-                        </textarea><i class="fa fa-question" data-tooltip="CR is used here to determine the difficulty rating of the combattant. This value will also determine the morale of the combattant."></i>
+                        </textarea><i class="fa fa-question" data-tooltip="CR is used here to determine the difficulty rating of the combattant. This value will also be used to determine the morale of the combattant."></i>
                     </td>
                 </tr>
             </table>
@@ -296,7 +297,7 @@ button {width:100px; text-align:justify}
                  </div>
              </div>
              <br />
-             <button onclick="duel();"><i class="fa fa-bolt"></i> Calculate</button>
+             <button onclick="duel()"><i class="fa fa-bolt"></i> Calculate</button>
              <button onclick='initial();console.log("cleared");$("#lineup").html("")'>
                  <i class="fa fa-trash-o"></i>
                  Clear
@@ -458,7 +459,7 @@ button {width:100px; text-align:justify}
                         <br /><br />
                     </p>
                     <p>
-                        <button onclick="clearAttacks()"> <i class="fa fa-trash-o"></i>Reset</button>
+                        <button onclick="clearAttacks()"> <i class="fa fa-trash-o"></i>Clear</button>
                         <button onclick="saveAttack()"><i class="fa fa-bolt"></i> Add to combatant</button>
                     </p>
             </div>
@@ -503,8 +504,7 @@ button {width:100px; text-align:justify}
                 </p>
                 <h3>Spell-list</h3>
                 <p>
-                    Spell budgeting troubles players, therefore there is not much spellcasting, bar for a handful of
-                    cantrips.
+                    Spell budgeting troubles players, therefore there is not much spellcasting, bar healing word.... actually, healing word is the only spell
                 </p>
                 </p>
             </div>
@@ -528,9 +528,39 @@ button {width:100px; text-align:justify}
                         code).
                     </li>
                     <li>
-                        <i class="fa-li fa fa-rocket"></i> Introduce machine learning to the code, so that it accepts
-                        more spells and can work on a grid.
+                        <i class="fab fa-acquisitions-incorporated"></i>Add more monsters from the official extra content.
                     </li>
+                    <li>
+                        <i class="fa-li fa fa-pencil"></i> Add Spells - there is only Healing Word at the moment... nothing else....
+                    </li>
+                    <li>
+                        <i class="fa-li fa fa-pencil"></i> Add abilities such as dragons breath and other innate abilities.
+                    </li>
+                    <li>
+                        <i class="fa-li fa fa-database"></i> Add 'spellbooks' as dictionaries that creatures can cast from. Single target spells first, then AOE.
+                    </li>
+                    <li>
+                        <i class="fa-li fa fa-pencil"></i> Add ability to specify teams, rather than rely on Alignment alone.
+                    </li>
+                    <li>
+                        <i class="fa-li fa fa-pencil"></i> Add some of the functionality from the other battle simulator for reporting and UI improvements.
+                    </li>
+                    <li>
+                        <i class="fa-li fa fa-pencil"></i> simplify battle parameters, for it to automatically fill to hit from specs, damage dice from the given weapon, and the damage modifier from the type of weapon and the combatants abilities.
+                    </li>
+                    <li>
+                        <i class="fa-li fa fa-bug"></i> fix custom values getting wiped and replaced when including a base creature in custom combatant
+                    </li>
+                    <li>
+                        <i class="fa-li fa fa-pencil"></i> update font-awesome
+                    </li>
+                    <li>
+                        <i class="fa-li fa fa-pencil"></i> Add classes to the custom fields. 
+                    </li>
+                    <!--<li>
+        <i class="fa-li fa fa-rocket"></i> Introduce machine learning to the code, so that it accepts
+        more spells and can work on a grid.
+    </li>-->
                 </ul>
             </div>
             <h2 id="links">

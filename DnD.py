@@ -165,7 +165,7 @@ class Dice:
             if verbose: verbose.append("Fumble!")
             return -999  # automatic fail
         elif result == 20:
-            if verbose: verbose.append("Crit!")
+            if verbose: verbose.append("Critically hit!")
             if self.twinned: self.twinned.crit = 1
             return 999  # automatic hit.
         else:
@@ -450,7 +450,8 @@ class Creature:
         if type(self.settings['attack_parameters']) is str:
             try:
                 import json
-                x = json.loads(self.settings['attack_parameters'].replace("*", "\""))  
+                # x = json.loads(self.settings['attack_parameters'].replace("*", "\""))
+                x = self.settings['attack_parameters']
                 self._attack_parse(x)
                 self.attack_parameters = x
             except:
@@ -486,21 +487,34 @@ class Creature:
         else:
             raise Exception('Could not determine weapon')
 
+        if 'cr' in self.settings: 
+            self.cr = self.settings['cr']
+        else:
+            self.settings['cr'] = 1 # Use 1 as a default value if none is given
+            # self.cr = 1
         # Check/set Morale
-        #this is where the value is validated or found and assignedmax_morale
-        #Also... I really (like REALLY) wanna break this out into its own method, and that may be the best option in case a creature does not have max_morale
-        self.max_morale = int(self.settings['max_morale'])
-        self.current_morale = int(self.settings['max_morale'])
+        #this is where the value is validated or found and assigned max_morale
+        # BREAK OUT INTO OWN METHOD
+        # could do cr and br assignments in one block. If there is no Cr, there's not going to be a Br
+        if 'br' in self.settings:
+            self.max_morale = int(self.settings['br'])
+            self.current_morale = int(self.settings['br'])
+        else : 
+            self.settings['max_morale'] = 0
+            self.max_morale = 0
+            self.current_morale = 0
+            
         print("getting Morale value")
-        if self.settings['max_morale'] =='' or int(self.settings['max_morale']) == 0: # if custom combattant, get CR and find proper morale
+        # IF creature is not in Beasiary or if Custom Combatant is given
+        if self.max_morale =='' or int(self.max_morale) == 0: # if custom combattant, get CR and find proper morale
             morale = 0
             # if morale is 0 or null, then check the CR and figure BR from that (do I need a fallback option?)
-            _cr = int(self.settings['CR'])
+            _cr = int(self.settings['cr']) #error regarding non-whole numbers should get resolved if/when the scale gets changed
             if _cr < 2:
                 morale = 1 # I think having CR0 - CR2 have BR == 2 would work
             elif _cr > 1 & _cr < 6: # may be unnecessarily  specific
                 morale = _cr 
-            elif _cr > 5 & _cr <= 9: # may be unnecessarily  specific
+            elif _cr > 5 & _cr < 10: 
                 morale = _cr + 1
             elif _cr == 10:
                 morale = 12
@@ -826,7 +840,7 @@ class Creature:
                              healing_spells=99999, healing_dice=1, healing_bonus=30,
                              ability_bonuses=[56, 21, 45, 31, 36, 34], sc_ability='wis',
                              buff='cast_nothing', buff_spells=0, log=None, hd=8, level=36, proficiency=27,
-                             max_morale=99, current_morale=99)
+                             br=99)
 
 
         else:
@@ -1232,7 +1246,7 @@ class Encounter:
 
     def blank(self, hard=True):
         # this resets the teams
-        # print(self.sides) #debugging (also to see when the method got hit)
+        # This is where The teams are set
         self.sides = set([dude.alignment for dude in self])
         self.tally['battles'] = 0
         self.tally['rounds'] = 0

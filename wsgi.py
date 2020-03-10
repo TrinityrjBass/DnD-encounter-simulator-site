@@ -123,12 +123,12 @@ def poster():              #If POST...
     print("Poster");
     #print()
     request_body = ""
-    list = tuple(request.form.items())[0][0]
+    #list = tuple(request.form.items())[0][0] #this one stopped working?!?
+    list = "" 
     # might be able to use .items() off a dictionary obj may work
     try:
         request_body_size = request.environ['CONTENT_LENGTH']
         print("body size : " + request_body_size)
-        print("list : " + list)
         #list = json.loads(request.json)
         #print("request body : " + request.form.read(request_body_size))
         #request_body = request.environ['wsgi.input'].read(request_body_size)
@@ -142,10 +142,11 @@ def poster():              #If POST...
     try:
         
         #l = json.loads(str(request_body)[2:-1])
-        l = json.loads(list)
+        #l = json.loads(str(request.json))
+        l = request.json
         # print("l : " + l)
         wwe = DnD.Encounter(*l)
-        w=threading.Thread(target=wwe.go_to_war,args=(5,)) #default is 1000, changing to 5 for testing
+        w=threading.Thread(target=wwe.go_to_war,args=(1000,)) #default is 1000, changing to 5 for testing
         w.start()
         time.sleep(10)
         wwe.KILL = True

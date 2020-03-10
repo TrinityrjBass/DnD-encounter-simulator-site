@@ -1,0 +1,35 @@
+.res {
+    width: 100%;
+    text-align: center;
+}
+
+body {
+    font-family: 'Raleway', sans-serif;
+}
+
+button {
+    width: 100px;
+    text-align: justify:
+}
+
+.external {
+    background: url(static/Icon_External_Link.png) center right no-repeat;
+    padding-right: 13px;
+}
+
+.clear input {
+    width: 60%;
+}
+
+#DIV_setup > div {
+    padding: 5px
+}
+
+#DIV_result > div {
+    width: 100%;
+    max-width: 100%
+}
+
+#numberOfA {
+    width: 4em;
+}

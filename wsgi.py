@@ -5,6 +5,7 @@ import sys
 import json
 import DnD
 import threading, time
+import creature
 
 
 
@@ -20,8 +21,7 @@ def render_static(page_name):
         return (sendindex())
     if request.method == 'POST':
         return (poster(start_response))
-    #return render_template('static.html')
-#'%s.html' % page_name
+
 
 if __name__ == '__main__':
     place="local"
@@ -32,7 +32,7 @@ else:
     host=8080 # used to be 8051
     apppath="/home/site/wwwroot/" #"app-root/repo/"
 print(place)
-DnD.Creature.beastiary=DnD.Creature.load_beastiary(apppath+'beastiary.csv')
+creature.Creature.beastiary=creature.Creature.load_beastiary(apppath+'beastiary.csv')
 
 def application(environ, start_response):
     # pretty sure I'm slowly deprecating this method
@@ -45,13 +45,13 @@ def application(environ, start_response):
 def sendindex():
     print("SendIndex")
     #Add creatures from bestiary to dropdown selection 
-    DnD.Creature.beastiary=DnD.Creature.load_beastiary(apppath+'beastiary.csv')
+    creature.Creature.beastiary=creature.Creature.load_beastiary(apppath+'beastiary.csv')
     ctype = 'text/html'
     h=open(apppath+"static.html")
     response_body = h.read()
     x='<!--serverside values-->'
     #read creatures in from beastiary
-    for name in sorted([DnD.Creature.beastiary[beast]['name'] for beast in DnD.Creature.beastiary],key=str.lower):
+    for name in sorted([creature.Creature.beastiary[beast]['name'] for beast in creature.Creature.beastiary],key=str.lower):
         x+='<option value="'+name+'">'+name+'</option>,'
     x.split(',')
     response_body=response_body.replace("<!--LABEL-->",x)

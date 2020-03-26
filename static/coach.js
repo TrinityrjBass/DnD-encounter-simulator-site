@@ -380,6 +380,7 @@ function initial() {
     sessionStorage.setItem('lineup', JSON.stringify([]));
     $("#OFF_more").hide();
     $("#OFF_work").hide();
+    $("#OFF_limits").hide();
     $("#OFF_link").hide();
     $("#OFF_motive").hide();
     $("#OFF_tool").hide();

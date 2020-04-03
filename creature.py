@@ -3,6 +3,7 @@ import DnD
 import math
 
 TARGET = 'enemy alive weakest'
+N = "<br/>"
 
 class Creature:
     """
@@ -97,9 +98,10 @@ class Creature:
         if not kwargs and type(wildcard) is str:
             self._fill_from_beastiary(wildcard)
         elif type(wildcard) is dict:
-            self._fill_from_dict(wildcard)
-            if not kwargs == {}:
-                print("dictionary passed followed by unpacked dictionary error")
+             self._initialise(**wildcard) # new attempt
+            # self._fill_from_dict(wildcard) # OG
+            #if not kwargs == {}: # seeing if commenting this out actually messes anything up
+            #    print("dictionary passed followed by unpacked dictionary error")
         elif kwargs and type(wildcard) is str:
             if wildcard in self.beastiary:
                 self._initialise(base=wildcard, **kwargs)
@@ -109,6 +111,7 @@ class Creature:
             self._initialise(base=wildcard, **kwargs)
         else:
             warnings.warn("UNKNOWN COMBATTANT:" + str(wildcard))
+            print("UNKNOWN COMBATTANT:" + str(wildcard))
             # raise Exception
             print("I will not raise an error. I will raise Cthulhu to punish this user errors")
             self._fill_from_preset("cthulhu")
@@ -119,7 +122,7 @@ class Creature:
         self.hurtful = 0
         if not 'attack_parameters' in self.settings:
             # Benefit of doubt. Given 'em a dagger . <-- but if you give them a dagger... then they will never use their fist (listed below)
-            self.settings['attack_parameters'] = 'dagger'
+            self.settings['attack_parameters'] = 'punch' # give them fisticuffs!
         if type(self.settings['attack_parameters']) is str:
             try:
                 import json
@@ -352,7 +355,9 @@ class Creature:
                 #if there are, call 'clean_settings' (sanify == to make healthy)
                 #else use 'commoner' as a base
 
-
+                # Should look into filling all fields that are given in a custom creature before checking the base creature and filling in the remaining fields
+                # But how do you determine a custom creature? I think a custom creature is going to be a dict. but a MM creature will be a string???? 
+                # so the check could be if it's a dic or string. if it's string, then fill from MM, if it's a dic, fill given fields, if no base is given, fill from commoner or try to figure it out? <- new functionality
         if settings:
             self.settings = Creature.clean_settings(settings)
         else:
@@ -493,6 +498,7 @@ class Creature:
         return self._initialise(**dictionary)
 
     def _fill_from_beastiary(self, name):
+        # Is this being used??
         if name in self.beastiary:
             return self._initialise(**self.beastiary[name])
         else:
@@ -921,7 +927,7 @@ class Creature:
     # TODO
     def TBA_act(self, verbose=0):
         if not self.arena.find('alive enemy'):
-            raise Encounter.Victory()
+            raise DnD.Encounter.Victory()
         x = {'nothing': 'cast_nothing'}
         choice = [self.check_action(x) for x in self.actions]
         best = sorted(choice.keys(), key=choice.get)[0]
@@ -929,7 +935,7 @@ class Creature:
 
     def act(self, verbose=0):
         if not self.arena.find('alive enemy'):
-            raise Encounter.Victory()
+            raise DnD.Encounter.Victory()
         # BONUS ACTION
         # heal  -healing word, a bonus action.
         if self.healing_spells > 0:
@@ -957,6 +963,7 @@ class Creature:
             else:
                 self.multiattack(verbose)
         else:
+
             self.multiattack(verbose)
 
     def generate_character_sheet(self):

@@ -235,6 +235,10 @@ function figureAtkParams() {
     // call method to figure Damage modifier
 }
 
+function clearWeapons() {
+    $("#weapon").val("");
+}
+
 function weaponDice() {
     var w = $("#weapon").val();
     for (var arm in armory) {

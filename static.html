@@ -207,42 +207,42 @@ button {width:100px; text-align:justify}
                     <tr>
                         <td class=clear>Str:</td>
                         <td class=clear>
-                            <input type="number" id=str value="1" min="1" >
+                            <input type="number" id=str value="10" min="1" >
                             </textarea><i class="fa fa-question" data-tooltip="Strength ability, not bonus."></i>
                         </td>
                     </tr>
                     <tr>
                         <td class=clear>Dex:</td>
                         <td class=clear>
-                            <input type="number" id=dex value="1" min="1" >
+                            <input type="number" id=dex value="10" min="1" >
                             </textarea><i class="fa fa-question" data-tooltip="Dex ability, not bonus."></i>
                         </td>
                     </tr>
                     <tr>
                         <td class=clear>Con:</td>
                         <td class=clear>
-                            <input type="number" id=con value="1" min="1" >
+                            <input type="number" id=con value="10" min="1" >
                             </textarea><i class="fa fa-question" data-tooltip="Constitution ability, not bonus."></i>
                         </td>
                     </tr>
                     <tr>
                         <td class=clear>Int:</td>
                         <td class=clear>
-                            <input type="number" id=int value="1" min="1" >
+                            <input type="number" id=int value="10" min="1" >
                             </textarea><i class="fa fa-question" data-tooltip="Intelligence ability, not bonus."></i>
                         </td>
                     </tr>
                     <tr>
                         <td class=clear>Wis:</td>
                         <td class=clear>
-                            <input type="number" id=wis value="1" min="1" >
+                            <input type="number" id=wis value="10" min="1" >
                             </textarea><i class="fa fa-question" data-tooltip="Wisdom ability, not bonus."></i>
                         </td>
                     </tr>
                     <tr>
                         <td class=clear>Cha:</td>
                         <td class=clear>
-                            <input type="number" id=cha value="1" min="1" >
+                            <input type="number" id=cha value="10" min="1" >
                             </textarea><i class="fa fa-question" data-tooltip="Charisma ability, not bonus."></i>
                         </td>
                     </tr>
@@ -396,7 +396,7 @@ button {width:100px; text-align:justify}
                         <tr>
                             <td><label>Weapon</label></td>
                             <td>
-                                <input list="weapons" id="weapon" name="browser"  onchange="figureAtkParams()">
+                                <input list="weapons" id="weapon" name="browser" onclick="clearWeapons()" onchange="figureAtkParams()">
                                 <datalist id="weapons">
                                     <option value="club">
                                     <option value="great club">
@@ -428,7 +428,6 @@ button {width:100px; text-align:justify}
                                     <option value="whip">
                                     <option value="claws">
                                     <option value="bite">
-
                                 </datalist>
                             </td>
                         </tr>

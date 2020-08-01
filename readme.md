@@ -1,3 +1,4 @@
+I have moved development to the DnD Royale project. I've updated the technologies and cleaned up a lot of the extraneous files. Please see that project for the newest features.
 ## Webserver
 This is the webserver files for the D&D encounter simulator. It is currenly only hosted on request as it's still in development.
 This is my first webapp, also first time working with Python, and deploying my own code.
